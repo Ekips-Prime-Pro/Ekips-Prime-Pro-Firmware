@@ -46,6 +46,6 @@ Gaps between segments are filled with `0xFF` (erased flash).
 ## CI
 
 `.github/workflows/ci.yml` runs on every push and pull request: `cargo fmt`
-check, `clippy -D warnings` (with and without `swd-debug`), host unit
+check, `clippy -D warnings` (with and without `swd-debug`, and for `hub-logic` incl. tests on the host), host unit
 tests, `cargo xtask bin` and a syntax check of the shell scripts. The
 image is uploaded as a build artifact.

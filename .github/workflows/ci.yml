@@ -33,6 +33,9 @@ jobs:
       - name: Clippy (firmware with swd-debug)
         run: cargo clippy --all-targets --features swd-debug -- -D warnings
 
+      - name: Clippy (hub-logic incl. tests, host)
+        run: cargo clippy -p ekips-hub-logic --all-targets --target host-tuple -- -D warnings
+
       - name: Clippy (xtask, host)
         run: cargo clippy --manifest-path xtask/Cargo.toml --target host-tuple -- -D warnings
 

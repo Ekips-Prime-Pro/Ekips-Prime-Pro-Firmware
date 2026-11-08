@@ -63,6 +63,18 @@ async fn main(spawner: Spawner) {
     drivers::status_light::set(ekips_hub_logic::led::Rgb::GREEN);
     spawner.spawn(drivers::matrix::task().unwrap());
     spawner.spawn(
+        drivers::imu::task(drivers::imu::ImuResources {
+            i2c: p.I2C2,
+            scl: p.PB10,
+            sda: p.PB3,
+            int1: p.PB4,
+            exti: p.EXTI4,
+            tx_dma: p.DMA1_CH7,
+            rx_dma: p.DMA1_CH2,
+        })
+        .unwrap(),
+    );
+    spawner.spawn(
         drivers::battery::task(drivers::battery::BatteryResources {
             iset_timer: p.TIM5,
             iset: p.PA0,

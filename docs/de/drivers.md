@@ -14,6 +14,7 @@ Host-Unit-Tests hat.
 | 4 | USB-CDC-ACM-Konsole (Echo) | `drivers::usb` | kompiliert |
 | 5 | 5×5-LED-Matrix | `drivers::matrix` | kompiliert, Schrift/Lauftext getestet |
 | 6 | Akku + Ladegerät | `drivers::battery` | kompiliert, Umrechnung/Zustandsautomat getestet |
+| 7 | IMU LSM6DS3TR-C | `drivers::imu` | kompiliert, Umrechnung/Heading getestet |
 
 ## 1. Power-Latch
 
@@ -112,3 +113,20 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
 - Ladestrom: 500 mA (ISET 15 %), sobald USB anliegt, siehe D-009.
 - Akku-LED: Orange = lädt, Grün = voll, Rot = Fehler, sonst aus.
 - Im Akkubetrieb unter 6000 mV für 5 s schaltet sich der Hub ab.
+
+## 7. IMU (LSM6DS3TR-C)
+
+- I2C2 mit 400 kHz (SCL PB10 AF4, SDA PB3 AF9), DMA1 Stream 7 (TX) und 2
+  (RX), Adresse 0x6A. Vor dem Bus-Start wird SCL 10-mal als GPIO getaktet,
+  um einen hängenden Chip zu befreien (wie bei Pybricks).
+- Einstellungen wie Pybricks: Software-Reset, BDU, 833 Hz, ±8 g,
+  ±2000 °/s, Gyro-Data-Ready auf INT1 (gepulst), Rundung Gyro + Accel.
+  `WHO_AM_I` muss 0x6A sein.
+- INT1 (PB4, EXTI4) weckt den Task für jede Messung; nach 50 ms ohne
+  Interrupt wird trotzdem gelesen.
+- Achsenvorzeichen aus Pybricks (`SIGN_X = -1, SIGN_Y = 1, SIGN_Z = -1`).
+- Heading: Integration der z-Drehrate, im Uhrzeigersinn positiv
+  (API-Konvention). Der Gyro-Offset wird gelernt, sobald der Hub ca. 1 s
+  stillsteht (alle Raten < 1,5 °/s); im Stillstand bleibt das Heading
+  stehen. Das Vorzeichen ist **nicht auf Hardware geprüft**.
+- Bei I2C-Fehlern wird der Chip alle 500 ms neu initialisiert.

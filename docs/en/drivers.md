@@ -13,6 +13,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 4 | USB CDC-ACM console (echo) | `drivers::usb` | compiles |
 | 5 | 5x5 light matrix | `drivers::matrix` | compiles, font/scrolling tested |
 | 6 | Battery + charger | `drivers::battery` | compiles, conversions/state machine tested |
+| 7 | IMU LSM6DS3TR-C | `drivers::imu` | compiles, conversion/heading tested |
 
 ## 1. Power latch
 
@@ -105,3 +106,20 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
 - Charge current: 500 mA (ISET 15 %) whenever USB is present, see D-009.
 - Battery LED: orange charging, green full, red fault, off otherwise.
 - On battery below 6000 mV for 5 s the hub powers off.
+
+## 7. IMU (LSM6DS3TR-C)
+
+- I2C2 at 400 kHz (SCL PB10 AF4, SDA PB3 AF9), DMA1 streams 7 (TX) and 2
+  (RX), address 0x6A. Before the bus starts, SCL is pulsed 10 times as a
+  GPIO to free a stuck chip (Pybricks does the same).
+- Setup as Pybricks: software reset, BDU, 833 Hz, ±8 g, ±2000 dps, gyro
+  data-ready on INT1 (pulsed), rounding gyro + accel. `WHO_AM_I` must be
+  0x6A.
+- INT1 (PB4, EXTI4) wakes the task for every sample; after 50 ms without
+  an interrupt it reads anyway.
+- Axis signs from Pybricks (`SIGN_X = -1, SIGN_Y = 1, SIGN_Z = -1`).
+- Heading: integration of the z rate, clockwise positive (API
+  convention). The gyro bias is learned whenever the hub is still for
+  about 1 s (all rates < 1.5 °/s); while still, the heading is frozen.
+  The sign is **not verified on hardware**.
+- On I2C errors the chip is re-initialized every 500 ms.

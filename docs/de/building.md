@@ -47,6 +47,6 @@ Lücken zwischen Segmenten werden mit `0xFF` (gelöschter Flash) gefüllt.
 ## CI
 
 `.github/workflows/ci.yml` läuft bei jedem Push und Pull Request:
-`cargo fmt`-Prüfung, `clippy -D warnings` (mit und ohne `swd-debug`),
+`cargo fmt`-Prüfung, `clippy -D warnings` (mit und ohne `swd-debug` sowie für `hub-logic` inkl. Tests auf dem Host),
 Host-Unit-Tests, `cargo xtask bin` und eine Syntaxprüfung der
 Shell-Skripte. Das Image wird als Build-Artefakt hochgeladen.

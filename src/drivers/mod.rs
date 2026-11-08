@@ -3,6 +3,7 @@
 pub mod analog;
 pub mod battery;
 pub mod buttons;
+pub mod imu;
 pub mod matrix;
 pub mod power;
 pub mod status_light;
