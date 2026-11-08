@@ -15,6 +15,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 6 | Battery + charger | `drivers::battery` | compiles, conversions/state machine tested |
 | 7 | IMU LSM6DS3TR-C | `drivers::imu` | compiles, conversion/heading tested |
 | 8 | Speaker | `drivers::speaker` | compiles, waveform tested |
+| 9 | Motor H-bridges (open loop) | `drivers::motors` | compiles, pin logic tested |
 
 ## 1. Power latch
 
@@ -136,3 +137,18 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
   replaces the running one. Volume 50 % by default (amplitude grows with
   the square of the volume).
 - At start-up the hub beeps once (1 kHz, 100 ms).
+
+## 9. Motor H-bridges
+
+- TIM1 (A, B), TIM4 (C, D), TIM3 (E, F) at 12 kHz, PWM mode 1, inverted
+  polarity, preload on (Pybricks values; the LEGO firmware uses 1.2 kHz).
+- `motors::set(port, Drive)` with `Drive::Coast`, `Drive::Brake` or
+  `Drive::Duty(-1000..=1000)`. Pin states as in Pybricks: coast = both
+  LOW, brake = both HIGH, forward = pin 1 PWM + pin 2 HIGH, reverse =
+  pin 1 HIGH + pin 2 PWM. A duty of 0 brakes.
+- Pins switch between GPIO and timer alternate function at runtime
+  (`bsp::raw`); they are claimed via `MotorResources` so no other driver
+  can take them.
+- All ports start in coast; panic and power-off coast them as well.
+- This layer is open loop. Angle/speed control (needed for
+  `motor_run_angle`, drive base) requires the encoder data from LUMP.

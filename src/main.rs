@@ -84,6 +84,25 @@ async fn main(spawner: Spawner) {
         })
         .unwrap(),
     );
+    drivers::motors::init(drivers::motors::MotorResources {
+        tim1: p.TIM1,
+        tim3: p.TIM3,
+        tim4: p.TIM4,
+        pins: [
+            p.PE9.into(),
+            p.PE11.into(),
+            p.PE13.into(),
+            p.PE14.into(),
+            p.PB6.into(),
+            p.PB7.into(),
+            p.PB8.into(),
+            p.PB9.into(),
+            p.PC6.into(),
+            p.PC7.into(),
+            p.PC8.into(),
+            p.PB1.into(),
+        ],
+    });
     // Start-up beep.
     drivers::speaker::beep(1000, 100);
     spawner.spawn(
@@ -98,6 +117,7 @@ async fn main(spawner: Spawner) {
     drivers::buttons::POWER_OFF_REQUEST.wait().await;
     drivers::usb::write(b"powering off\r\n");
     drivers::matrix::clear();
+    drivers::motors::coast_all();
     embassy_time::Timer::after_millis(100).await;
     drivers::power::power_off();
 }

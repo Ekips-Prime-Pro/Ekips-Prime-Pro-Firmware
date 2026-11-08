@@ -16,6 +16,7 @@ Host-Unit-Tests hat.
 | 6 | Akku + Ladegerät | `drivers::battery` | kompiliert, Umrechnung/Zustandsautomat getestet |
 | 7 | IMU LSM6DS3TR-C | `drivers::imu` | kompiliert, Umrechnung/Heading getestet |
 | 8 | Lautsprecher | `drivers::speaker` | kompiliert, Wellenform getestet |
+| 9 | Motor-H-Brücken (ungeregelt) | `drivers::motors` | kompiliert, Pin-Logik getestet |
 
 ## 1. Power-Latch
 
@@ -144,3 +145,20 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
   ersetzt den laufenden. Lautstärke standardmäßig 50 % (die Amplitude
   wächst mit dem Quadrat der Lautstärke).
 - Beim Start piept der Hub einmal (1 kHz, 100 ms).
+
+## 9. Motor-H-Brücken
+
+- TIM1 (A, B), TIM4 (C, D), TIM3 (E, F) mit 12 kHz, PWM-Modus 1,
+  invertierte Polarität, Preload an (Pybricks-Werte; die LEGO-Firmware
+  nutzt 1,2 kHz).
+- `motors::set(port, Drive)` mit `Drive::Coast`, `Drive::Brake` oder
+  `Drive::Duty(-1000..=1000)`. Pin-Zustände wie bei Pybricks: Auslaufen =
+  beide LOW, Bremsen = beide HIGH, vorwärts = Pin 1 PWM + Pin 2 HIGH,
+  rückwärts = Pin 1 HIGH + Pin 2 PWM. Duty 0 bremst.
+- Die Pins wechseln zur Laufzeit zwischen GPIO und Timer-Alternate-Function
+  (`bsp::raw`); sie werden über `MotorResources` beansprucht, damit kein
+  anderer Treiber sie nehmen kann.
+- Alle Ports starten im Auslaufmodus; Panic und Ausschalten schalten sie
+  ebenfalls auf Auslaufen.
+- Diese Schicht ist ungeregelt. Winkel-/Drehzahlregelung (nötig für
+  `motor_run_angle`, Fahrbasis) braucht die Encoder-Daten über LUMP.

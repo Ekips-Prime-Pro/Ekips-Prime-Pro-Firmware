@@ -5,6 +5,7 @@ pub mod battery;
 pub mod buttons;
 pub mod imu;
 pub mod matrix;
+pub mod motors;
 pub mod power;
 pub mod speaker;
 pub mod status_light;
