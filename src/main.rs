@@ -103,6 +103,17 @@ async fn main(spawner: Spawner) {
             p.PB1.into(),
         ],
     });
+    drivers::lump::start(
+        spawner,
+        drivers::lump::LumpResources {
+            a: (p.UART7, p.PE7, p.PE8, p.PA10.into()),
+            b: (p.UART4, p.PD0, p.PD1, p.PA8.into()),
+            c: (p.UART8, p.PE0, p.PE1, p.PE5.into()),
+            d: (p.UART5, p.PD2, p.PC12, p.PB2.into()),
+            e: (p.UART10, p.PE2, p.PE3, p.PB5.into()),
+            f: (p.UART9, p.PD14, p.PD15, p.PC5.into()),
+        },
+    );
     // Start-up beep.
     drivers::speaker::beep(1000, 100);
     spawner.spawn(

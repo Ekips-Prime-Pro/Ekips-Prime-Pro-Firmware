@@ -4,6 +4,7 @@ pub mod analog;
 pub mod battery;
 pub mod buttons;
 pub mod imu;
+pub mod lump;
 pub mod matrix;
 pub mod motors;
 pub mod power;

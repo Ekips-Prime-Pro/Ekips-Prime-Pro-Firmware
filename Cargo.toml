@@ -54,6 +54,7 @@ defmt = "1"
 defmt-rtt = "1"
 static_cell = "2"
 heapless = "0.9"
+embedded-io-async = "0.7"
 ekips-hub-api = { git = "https://github.com/Ekips-Prime-Pro/ekips-prime-pro-core", rev = "81a4bd574b93502b0347d641d12bb7e7b2519890" }
 
 [profile.dev]

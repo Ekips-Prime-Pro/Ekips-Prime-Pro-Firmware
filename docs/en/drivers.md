@@ -16,6 +16,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 7 | IMU LSM6DS3TR-C | `drivers::imu` | compiles, conversion/heading tested |
 | 8 | Speaker | `drivers::speaker` | compiles, waveform tested |
 | 9 | Motor H-bridges (open loop) | `drivers::motors` | compiles, pin logic tested |
+| 10 | LUMP (sensors, motor encoders) | `drivers::lump` | compiles, protocol tested |
 
 ## 1. Power latch
 
@@ -152,3 +153,26 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
 - All ports start in coast; panic and power-off coast them as well.
 - This layer is open loop. Angle/speed control (needed for
   `motor_run_angle`, drive base) requires the encoder data from LUMP.
+
+## 10. LUMP – sensors and motor encoders
+
+- One task per port, buffered UART (UART7/4/8/5/10/9 for ports A–F),
+  line buffer enable active LOW, port VCC (PA14) switched on at start.
+- Handshake at 2400 baud: wait for `TYPE`, collect `MODES`, `SPEED` and
+  `INFO FORMAT`, answer the device's `ACK` with `ACK`, switch to the
+  negotiated speed (115200), select the default mode:
+  motors → mode 2 (position, int32 degrees), color sensor → mode 0
+  (color), ultrasonic → mode 0 (distance mm), force → mode 0.
+- Data mode: `NACK` keep-alive every 100 ms; after 300 ms without data
+  (or a new `TYPE`) the handshake starts again.
+- `lump::state(port)` gives class, type ID and the last payload;
+  `lump::select_mode()` / `lump::write()` send commands (e.g. sensor
+  lights).
+- The parser resynchronizes by dropping bytes until a checksum matches.
+- Known type IDs: SPIKE M/L/S motor 48/49/65, Technic M/L angular motor
+  75/76, color 61, ultrasonic 62, force 63.
+- Not implemented: passive device detection on P5/P6 (DCM) and the fast
+  115200 sync Pybricks tries first.
+- Note: the spike-rtic LUMP reference lists checksum `0x68` for the
+  "lights white" example; the correct value is `0x48` (verified in a
+  unit test).

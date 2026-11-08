@@ -17,6 +17,7 @@ Host-Unit-Tests hat.
 | 7 | IMU LSM6DS3TR-C | `drivers::imu` | kompiliert, Umrechnung/Heading getestet |
 | 8 | Lautsprecher | `drivers::speaker` | kompiliert, Wellenform getestet |
 | 9 | Motor-H-Brücken (ungeregelt) | `drivers::motors` | kompiliert, Pin-Logik getestet |
+| 10 | LUMP (Sensoren, Motor-Encoder) | `drivers::lump` | kompiliert, Protokoll getestet |
 
 ## 1. Power-Latch
 
@@ -162,3 +163,27 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
   ebenfalls auf Auslaufen.
 - Diese Schicht ist ungeregelt. Winkel-/Drehzahlregelung (nötig für
   `motor_run_angle`, Fahrbasis) braucht die Encoder-Daten über LUMP.
+
+## 10. LUMP – Sensoren und Motor-Encoder
+
+- Ein Task pro Port, gepufferter UART (UART7/4/8/5/10/9 für Ports A–F),
+  Leitungspuffer aktiv LOW, Port-VCC (PA14) wird beim Start eingeschaltet.
+- Handshake mit 2400 Baud: auf `TYPE` warten, `MODES`, `SPEED` und
+  `INFO FORMAT` sammeln, das `ACK` des Geräts mit `ACK` beantworten, auf
+  die ausgehandelte Geschwindigkeit (115200) umschalten, Standardmodus
+  wählen: Motoren → Modus 2 (Position, int32 Grad), Farbsensor → Modus 0
+  (Farbe), Ultraschall → Modus 0 (Abstand mm), Kraftsensor → Modus 0.
+- Datenmodus: `NACK` als Keep-alive alle 100 ms; nach 300 ms ohne Daten
+  (oder einem neuen `TYPE`) beginnt der Handshake von vorn.
+- `lump::state(port)` liefert Klasse, Typ-ID und die letzten Nutzdaten;
+  `lump::select_mode()` / `lump::write()` senden Befehle (z. B.
+  Sensorlicht).
+- Der Parser synchronisiert sich neu, indem er Bytes verwirft, bis eine
+  Prüfsumme stimmt.
+- Bekannte Typ-IDs: SPIKE-Motor M/L/S 48/49/65, Technic-Winkelmotor M/L
+  75/76, Farbe 61, Ultraschall 62, Kraft 63.
+- Nicht umgesetzt: passive Geräteerkennung über P5/P6 (DCM) und der
+  schnelle 115200-Sync, den Pybricks zuerst versucht.
+- Hinweis: Die LUMP-Referenz von spike-rtic nennt für das Beispiel
+  „Licht weiß“ die Prüfsumme `0x68`; richtig ist `0x48` (per Unit-Test
+  geprüft).
