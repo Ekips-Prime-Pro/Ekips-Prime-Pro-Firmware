@@ -13,4 +13,5 @@ pub mod imu;
 pub mod ladder;
 pub mod led;
 pub mod matrix;
+pub mod sound;
 pub mod tlc5955;

@@ -14,6 +14,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 5 | 5x5 light matrix | `drivers::matrix` | compiles, font/scrolling tested |
 | 6 | Battery + charger | `drivers::battery` | compiles, conversions/state machine tested |
 | 7 | IMU LSM6DS3TR-C | `drivers::imu` | compiles, conversion/heading tested |
+| 8 | Speaker | `drivers::speaker` | compiles, waveform tested |
 
 ## 1. Power latch
 
@@ -123,3 +124,15 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
   about 1 s (all rates < 1.5 °/s); while still, the heading is frozen.
   The sign is **not verified on hardware**.
 - On I2C errors the chip is re-initialized every 500 ms.
+
+## 8. Speaker
+
+- DAC1 channel 1 on PA4, amplifier enable PC10 (only HIGH while a beep
+  plays).
+- One period (32 samples) of a square wave around mid level is played in
+  a loop by circular DMA (DMA1 stream 5 / channel 7); TIM6 TRGO paces the
+  DAC at `32 × f`. Frequencies are clamped to 20–10 000 Hz.
+- `speaker::beep(freq_hz, duration_ms)` never blocks; a new beep
+  replaces the running one. Volume 50 % by default (amplitude grows with
+  the square of the volume).
+- At start-up the hub beeps once (1 kHz, 100 ms).

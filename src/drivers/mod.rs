@@ -6,6 +6,7 @@ pub mod buttons;
 pub mod imu;
 pub mod matrix;
 pub mod power;
+pub mod speaker;
 pub mod status_light;
 pub mod tlc5955;
 pub mod usb;

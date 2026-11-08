@@ -75,6 +75,18 @@ async fn main(spawner: Spawner) {
         .unwrap(),
     );
     spawner.spawn(
+        drivers::speaker::task(drivers::speaker::SpeakerResources {
+            dac: p.DAC1,
+            out: p.PA4,
+            dma: p.DMA1_CH5,
+            timer: p.TIM6,
+            amp_enable: p.PC10,
+        })
+        .unwrap(),
+    );
+    // Start-up beep.
+    drivers::speaker::beep(1000, 100);
+    spawner.spawn(
         drivers::battery::task(drivers::battery::BatteryResources {
             iset_timer: p.TIM5,
             iset: p.PA0,

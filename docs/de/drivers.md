@@ -15,6 +15,7 @@ Host-Unit-Tests hat.
 | 5 | 5×5-LED-Matrix | `drivers::matrix` | kompiliert, Schrift/Lauftext getestet |
 | 6 | Akku + Ladegerät | `drivers::battery` | kompiliert, Umrechnung/Zustandsautomat getestet |
 | 7 | IMU LSM6DS3TR-C | `drivers::imu` | kompiliert, Umrechnung/Heading getestet |
+| 8 | Lautsprecher | `drivers::speaker` | kompiliert, Wellenform getestet |
 
 ## 1. Power-Latch
 
@@ -130,3 +131,16 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
   stillsteht (alle Raten < 1,5 °/s); im Stillstand bleibt das Heading
   stehen. Das Vorzeichen ist **nicht auf Hardware geprüft**.
 - Bei I2C-Fehlern wird der Chip alle 500 ms neu initialisiert.
+
+## 8. Lautsprecher
+
+- DAC1 Kanal 1 an PA4, Verstärker-Freigabe PC10 (nur HIGH, solange ein
+  Ton spielt).
+- Eine Periode (32 Samples) einer Rechteckwelle um den Mittelpegel wird
+  per zirkulärem DMA (DMA1 Stream 5 / Kanal 7) in Schleife ausgegeben;
+  TIM6-TRGO taktet den DAC mit `32 × f`. Frequenzen werden auf
+  20–10 000 Hz begrenzt.
+- `speaker::beep(freq_hz, duration_ms)` blockiert nie; ein neuer Ton
+  ersetzt den laufenden. Lautstärke standardmäßig 50 % (die Amplitude
+  wächst mit dem Quadrat der Lautstärke).
+- Beim Start piept der Hub einmal (1 kHz, 100 ms).
