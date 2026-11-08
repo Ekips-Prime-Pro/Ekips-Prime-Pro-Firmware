@@ -9,6 +9,8 @@ Host-Unit-Tests hat.
 | 1 | Power-Latch, Port-VCC, Ausschalten | `drivers::power` | kompiliert |
 | 2 | Analogeingänge (ADC1) | `drivers::analog` | kompiliert |
 | 2 | Tasten + Ausschalten per langem Druck | `drivers::buttons` | kompiliert, Logik getestet |
+| 3 | TLC5955-LED-Treiber | `drivers::tlc5955` | kompiliert, Frames getestet |
+| 3 | Status-LED (Mitteltaste) | `drivers::status_light` | kompiliert, Farblogik getestet |
 
 ## 1. Power-Latch
 
@@ -42,3 +44,24 @@ blockierende Messungen ersetzen den TIM2-+-DMA-Trigger von Pybricks
   losgelassen worden sein.
 - Messwerte unterhalb der niedrigsten Schwelle (ADC noch nicht
   eingeschwungen, Hardwarefehler) werden ignoriert.
+
+## 3. TLC5955 und Status-LED
+
+Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
+(er wird von der 5×5-Matrix und dem MODE-Pin des Laders mitbenutzt).
+
+- SPI1 mit 24 MHz, Modus 0, MSB zuerst, TX über DMA2 Stream 3 / Kanal 3.
+  Nur SCK und MOSI werden genutzt (MISO würde das Schieberegister
+  zurücklesen).
+- Frame: 97 Bytes (769 Bit). Control-Frame Byte für Byte wie Pybricks'
+  Makro `TLC5955_CONTROL_DATA` mit DC 127, MC 3,2 mA, BC 127, Auto-Repeat,
+  ES-PWM. Er wird beim Start zweimal gesendet (die Maximalstrom-Einstellung
+  greift erst beim zweiten Mal).
+- Graustufen: Kanal *n* in den Bytes `2n+1, 2n+2`, Big Endian (die Kanäle
+  liegen in umgekehrter Reihenfolge in den GS-Registern).
+- LAT (PA15) geht nach jedem Frame für ca. 1 µs auf HIGH.
+- GSCLK: TIM12_CH2 an PB15, 9,6 MHz, 50 %.
+- Farben: Farb- und Helligkeitskorrektur von Pybricks (`led_pwm.c`), mit
+  RGB statt HSV als Eingabe.
+- Die Status-LED sind die zwei RGB-LEDs der Mitteltaste (oben 5/4/3, unten
+  8/7/6). Die Firmware setzt sie nach dem Start auf Grün.

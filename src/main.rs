@@ -39,6 +39,20 @@ async fn main(spawner: Spawner) {
         .unwrap(),
     );
     spawner.spawn(drivers::buttons::task().unwrap());
+    spawner.spawn(
+        drivers::tlc5955::task(drivers::tlc5955::Tlc5955Resources {
+            spi: p.SPI1,
+            sck: p.PA5,
+            mosi: p.PA7,
+            tx_dma: p.DMA2_CH3,
+            lat: p.PA15,
+            gsclk_timer: p.TIM12,
+            gsclk: p.PB15,
+        })
+        .unwrap(),
+    );
+    // Green status light: firmware is running.
+    drivers::status_light::set(ekips_hub_logic::led::Rgb::GREEN);
 
     drivers::buttons::POWER_OFF_REQUEST.wait().await;
     drivers::power::power_off();

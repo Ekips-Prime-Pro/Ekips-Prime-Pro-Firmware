@@ -3,3 +3,5 @@
 pub mod analog;
 pub mod buttons;
 pub mod power;
+pub mod status_light;
+pub mod tlc5955;
