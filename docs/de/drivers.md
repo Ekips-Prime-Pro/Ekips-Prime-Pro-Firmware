@@ -12,6 +12,7 @@ Host-Unit-Tests hat.
 | 3 | TLC5955-LED-Treiber | `drivers::tlc5955` | kompiliert, Frames getestet |
 | 3 | Status-LED (Mitteltaste) | `drivers::status_light` | kompiliert, Farblogik getestet |
 | 4 | USB-CDC-ACM-Konsole (Echo) | `drivers::usb` | kompiliert |
+| 5 | 5×5-LED-Matrix | `drivers::matrix` | kompiliert, Schrift/Lauftext getestet |
 
 ## 1. Power-Latch
 
@@ -78,3 +79,19 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
   wird verworfen, damit ein fehlender Host nie ein Programm blockiert).
 - Unter Linux sollte der Hub als `/dev/ttyACM0` erscheinen; testen z. B.
   mit `picocom /dev/ttyACM0` (sobald Hardware da ist).
+
+## 5. 5×5-LED-Matrix
+
+- Die Pixel sind TLC5955-Kanäle (`bsp::pins::TLC_MATRIX`, aus Pybricks).
+- `matrix::show_image(Image)` – Helligkeit 0–100 % pro Pixel, quadriert
+  in einen Duty-Cycle umgerechnet (wirkt linearer).
+- `matrix::show_text(&str)` – ein Zeichen wird zentriert und statisch
+  angezeigt; längerer Text läuft von rechts nach links, eine Spalte pro
+  80 ms, mit 60 % Helligkeit. Eine neue Anfrage unterbricht laufenden
+  Text.
+- Schrift: eigene 3×5-Pixel-Schrift (0–9, A–Z, `- + . , : !`, Leerzeichen;
+  unbekannte Zeichen werden zu `?`; Kleinbuchstaben werden groß
+  dargestellt).
+- `matrix::set_orientation()` dreht die Ausgabe. Die Standardausrichtung
+  ist nicht auf Hardware geprüft.
+- Beim Start läuft „EKIPS“ durch.

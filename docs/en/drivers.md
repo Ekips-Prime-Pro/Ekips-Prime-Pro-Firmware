@@ -11,6 +11,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 3 | TLC5955 LED driver | `drivers::tlc5955` | compiles, frames tested |
 | 3 | Status light (center button) | `drivers::status_light` | compiles, color logic tested |
 | 4 | USB CDC-ACM console (echo) | `drivers::usb` | compiles |
+| 5 | 5x5 light matrix | `drivers::matrix` | compiles, font/scrolling tested |
 
 ## 1. Power latch
 
@@ -73,3 +74,17 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
   host never blocks a program).
 - On Linux the hub should appear as `/dev/ttyACM0`; test with e.g.
   `picocom /dev/ttyACM0` (once hardware is available).
+
+## 5. 5x5 light matrix
+
+- Pixels are TLC5955 channels (`bsp::pins::TLC_MATRIX`, from Pybricks).
+- `matrix::show_image(Image)` – brightness 0–100 % per pixel, squared to a
+  duty cycle for perceived linearity.
+- `matrix::show_text(&str)` – one character is shown centered and
+  static; longer text scrolls right to left, one column per 80 ms, at
+  60 % brightness. A new request interrupts running text.
+- Font: our own 3x5 pixel font (0–9, A–Z, `- + . , : !`, space; unknown
+  characters become `?`; lower case is shown as upper case).
+- `matrix::set_orientation()` rotates the output. The default
+  orientation is not verified on hardware.
+- At start-up the firmware scrolls "EKIPS".

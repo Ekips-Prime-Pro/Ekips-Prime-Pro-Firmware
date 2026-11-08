@@ -10,4 +10,5 @@
 pub mod buttons;
 pub mod ladder;
 pub mod led;
+pub mod matrix;
 pub mod tlc5955;
