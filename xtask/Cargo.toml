@@ -1,0 +1,12 @@
+# Host-side helper tool. Not part of the firmware workspace because it is
+# built for the host, not for thumbv7em-none-eabihf. Run it via `cargo xtask`.
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[workspace]
+
+[dependencies]

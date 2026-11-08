@@ -1,0 +1,23 @@
+# Build configuration for the LEGO SPIKE Prime hub (STM32F413VGT6, Cortex-M4F).
+
+[build]
+target = "thumbv7em-none-eabihf"
+
+[target.thumbv7em-none-eabihf]
+# `cargo run` flashes over SWD with probe-rs. This is only for the future
+# debug setup (Raspberry Pi Pico 2 W as debug probe) and is NOT tested yet.
+# probe-rs only erases the flash sectors the ELF occupies (sector 2 and up),
+# so the LEGO bootloader in sectors 0-1 stays untouched.
+runner = "probe-rs run --chip STM32F413VGTx"
+rustflags = [
+  "-C", "link-arg=--nmagic",
+  "-C", "link-arg=-Tlink.x",
+  "-C", "link-arg=-Tdefmt.x",
+]
+
+[env]
+DEFMT_LOG = "info"
+
+[alias]
+# Host-side helper tasks (build .bin, safety checks). See xtask/src/main.rs.
+xtask = "run --quiet --manifest-path xtask/Cargo.toml --target host-tuple --"

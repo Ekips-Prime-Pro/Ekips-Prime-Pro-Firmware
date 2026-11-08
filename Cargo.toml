@@ -1,0 +1,69 @@
+[workspace]
+members = [".", "crates/hub-logic"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.89"
+license = "MIT"
+authors = ["David Frings <dev@davidfrings.dev>"]
+repository = "https://github.com/Ekips-Prime-Pro/ekips-prime-pro-firmware"
+
+[workspace.lints.rust]
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[package]
+name = "ekips-prime-pro-firmware"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Custom firmware for the LEGO SPIKE Prime hub (STM32F413) built on Embassy"
+publish = false
+
+[[bin]]
+name = "ekips-prime-pro-firmware"
+test = false
+bench = false
+
+[features]
+default = []
+# Keep PA13/PA14 in their reset state (SWDIO/SWCLK) so a debug probe can stay
+# attached. The hub must then be powered over USB. See docs/en/debugging.md.
+swd-debug = []
+
+[lints]
+workspace = true
+
+[dependencies]
+ekips-hub-logic = { path = "crates/hub-logic", features = ["defmt"] }
+embassy-executor = { version = "0.10", features = ["platform-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
+embassy-stm32 = { version = "0.6", features = ["stm32f413vg", "defmt", "time-driver-tim9", "exti", "unstable-pac", "rt"] }
+embassy-time = { version = "0.5", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-1_000_000"] }
+embassy-usb = { version = "0.6", features = ["defmt"] }
+embassy-sync = { version = "0.8", features = ["defmt"] }
+embassy-futures = "0.1"
+cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
+cortex-m-rt = { version = "0.7", features = ["set-vtor"] }
+defmt = "1"
+defmt-rtt = "1"
+static_cell = "2"
+heapless = "0.9"
+embedded-io-async = "0.7"
+ekips-hub-api = { git = "https://github.com/Ekips-Prime-Pro/ekips-prime-pro-core", rev = "81a4bd574b93502b0347d641d12bb7e7b2519890" }
+
+[profile.dev]
+opt-level = "s"
+debug = 2
+
+[profile.release]
+opt-level = "s"
+debug = 2
+lto = "fat"
+codegen-units = 1
+incremental = false

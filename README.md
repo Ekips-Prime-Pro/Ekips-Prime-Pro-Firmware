@@ -5,7 +5,7 @@ in `no_std` Rust with [Embassy](https://embassy.dev). It runs Ekips Prime Pro
 programs in the bytecode VM from
 [Ekips-Prime-Pro-Core](https://github.com/Ekips-Prime-Pro/Ekips-Prime-Pro-Core).
 
-> **Status:** not started yet. The language, compiler and simulator come first.
+> **Status:** early development, **untested on hardware**. See [docs/](docs/README.md).
 
 ## Plan
 
@@ -17,21 +17,27 @@ programs in the bytecode VM from
   (color, distance, force).
 - Implements the `Hardware` trait from `ekips-hub-api`.
 
-Flashing (hub in DFU mode):
+Build and flash (hub in DFU mode) – **read [docs/en/flashing.md](docs/en/flashing.md)
+([deutsch](docs/de/flashing.md)) first, back up the original firmware, and note
+that the firmware is untested on hardware**:
 
 ```sh
-dfu-util -d 0694:0011 -a 0 -s 0x08008000:leave -D firmware.bin
+cargo xtask bin
+dfu-util -d 0694:0011 -a 0 -s 0x08008000:leave -D target/firmware.bin
 ```
 
-**Back up the original firmware first.** The official LEGO firmware can always
-be restored via the DFU bootloader.
+The official LEGO firmware can always be restored via the DFU bootloader.
 
 ## Credits
 
+The hardware knowledge in this firmware is derived from these MIT-licensed
+projects (copyright notices in [NOTICE](NOTICE)):
+
 - [Pybricks](https://github.com/pybricks/pybricks-micropython) – hardware
   details (pin mapping, LUMP protocol, motor control).
+  © The Pybricks Authors.
 - [spike-rtic](https://github.com/springyworks/spike-rtic) – bare-metal Rust
-  reference for the same hub.
+  reference for the same hub. © spike-rtic contributors.
 
 LEGO and SPIKE are trademarks of the LEGO Group, which does not sponsor or
 endorse this project.

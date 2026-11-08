@@ -1,0 +1,156 @@
+//! Ekips Prime Pro firmware for the LEGO SPIKE Prime hub.
+//!
+//! Start-up order:
+//!
+//! 1. `__pre_init` (assembly, [`drivers::power`]): power latch PA13 HIGH.
+//! 2. Embassy init with the Pybricks clock tree ([`bsp::clock_config`]).
+//! 3. Drivers are started as Embassy tasks.
+//!
+//! **Untested on hardware.**
+
+#![no_std]
+#![no_main]
+
+mod bsp;
+mod drivers;
+mod hub;
+
+use defmt_rtt as _;
+use embassy_executor::Spawner;
+
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
+    drivers::power::hold();
+    let p = embassy_stm32::init(bsp::clock_config());
+    defmt::info!(
+        "Ekips Prime Pro firmware started (USB powered: {})",
+        drivers::power::usb_powered()
+    );
+
+    spawner.spawn(
+        drivers::analog::task(drivers::analog::AnalogResources {
+            adc: p.ADC1,
+            battery_current: p.PC0,
+            battery_voltage: p.PC1,
+            battery_ntc: p.PB0,
+            usb_charge_current: p.PA3,
+            ladder_center: p.PC4,
+            ladder_buttons: p.PA1,
+        })
+        .unwrap(),
+    );
+    spawner.spawn(drivers::buttons::task().unwrap());
+    spawner.spawn(
+        drivers::tlc5955::task(drivers::tlc5955::Tlc5955Resources {
+            spi: p.SPI1,
+            sck: p.PA5,
+            mosi: p.PA7,
+            tx_dma: p.DMA2_CH3,
+            lat: p.PA15,
+            gsclk_timer: p.TIM12,
+            gsclk: p.PB15,
+        })
+        .unwrap(),
+    );
+    drivers::usb::start(
+        spawner,
+        drivers::usb::UsbResources {
+            otg: p.USB_OTG_FS,
+            dp: p.PA12,
+            dm: p.PA11,
+        },
+    );
+    // Green status light: firmware is running.
+    drivers::status_light::set(ekips_hub_logic::led::Rgb::GREEN);
+    spawner.spawn(drivers::matrix::task().unwrap());
+    spawner.spawn(
+        drivers::imu::task(drivers::imu::ImuResources {
+            i2c: p.I2C2,
+            scl: p.PB10,
+            sda: p.PB3,
+            int1: p.PB4,
+            exti: p.EXTI4,
+            tx_dma: p.DMA1_CH7,
+            rx_dma: p.DMA1_CH2,
+        })
+        .unwrap(),
+    );
+    spawner.spawn(
+        drivers::speaker::task(drivers::speaker::SpeakerResources {
+            dac: p.DAC1,
+            out: p.PA4,
+            dma: p.DMA1_CH5,
+            timer: p.TIM6,
+            amp_enable: p.PC10,
+        })
+        .unwrap(),
+    );
+    drivers::motors::init(drivers::motors::MotorResources {
+        tim1: p.TIM1,
+        tim3: p.TIM3,
+        tim4: p.TIM4,
+        pins: [
+            p.PE9.into(),
+            p.PE11.into(),
+            p.PE13.into(),
+            p.PE14.into(),
+            p.PB6.into(),
+            p.PB7.into(),
+            p.PB8.into(),
+            p.PB9.into(),
+            p.PC6.into(),
+            p.PC7.into(),
+            p.PC8.into(),
+            p.PB1.into(),
+        ],
+    });
+    drivers::lump::start(
+        spawner,
+        drivers::lump::LumpResources {
+            a: (p.UART7, p.PE7, p.PE8, p.PA10.into()),
+            b: (p.UART4, p.PD0, p.PD1, p.PA8.into()),
+            c: (p.UART8, p.PE0, p.PE1, p.PE5.into()),
+            d: (p.UART5, p.PD2, p.PC12, p.PB2.into()),
+            e: (p.UART10, p.PE2, p.PE3, p.PB5.into()),
+            f: (p.UART9, p.PD14, p.PD15, p.PC5.into()),
+        },
+    );
+    spawner.spawn(drivers::motor_control::task().unwrap());
+    // Start-up beep.
+    drivers::speaker::beep(1000, 100);
+    spawner.spawn(
+        drivers::battery::task(drivers::battery::BatteryResources {
+            iset_timer: p.TIM5,
+            iset: p.PA0,
+        })
+        .unwrap(),
+    );
+    drivers::matrix::show_text("EKIPS");
+
+    // The VM is not integrated yet. The hub object is created so the
+    // Hardware implementation is linked and type checked.
+    let mut hub = hub::SpikeHub::new();
+    ekips_hub_api::Hardware::print(&mut hub, "hub ready");
+
+    drivers::buttons::POWER_OFF_REQUEST.wait().await;
+    drivers::usb::write(b"powering off\r\n");
+    drivers::matrix::clear();
+    for port in ekips_hub_api::Port::ALL {
+        drivers::motor_control::coast(port);
+    }
+    drivers::motors::coast_all();
+    embassy_time::Timer::after_millis(100).await;
+    drivers::power::power_off();
+}
+
+/// Panic: put actuators into a safe state, then power off after a while so
+/// a crashed hub does not drain the battery. On USB power it stays on.
+#[panic_handler]
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    cortex_m::interrupt::disable();
+    bsp::safe_state();
+    defmt::error!("panic: {}", defmt::Display2Format(info));
+    // ~10 s (the delay is in CPU cycles).
+    cortex_m::asm::delay(10 * bsp::SYSCLK_HZ);
+    drivers::power::power_off()
+}
