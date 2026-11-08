@@ -41,7 +41,7 @@ swd-debug = []
 workspace = true
 
 [dependencies]
-ekips-hub-logic = { path = "crates/hub-logic" }
+ekips-hub-logic = { path = "crates/hub-logic", features = ["defmt"] }
 embassy-executor = { version = "0.10", features = ["platform-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
 embassy-stm32 = { version = "0.6", features = ["stm32f413vg", "defmt", "time-driver-tim9", "exti", "unstable-pac", "rt"] }
 embassy-time = { version = "0.5", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-1_000_000"] }

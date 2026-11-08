@@ -13,6 +13,7 @@ through the `Hardware` trait from `ekips-hub-api`.
 - [Building](building.md)
 - [Memory map](memory-map.md)
 - [Pinout](pinout.md)
+- [Drivers](drivers.md)
 - [Debugging](debugging.md)
 
 ## Ground rules

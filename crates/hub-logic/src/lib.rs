@@ -6,3 +6,6 @@
 //! is available. The firmware crate wraps these pieces in drivers.
 
 #![no_std]
+
+pub mod buttons;
+pub mod ladder;
