@@ -1,0 +1,54 @@
+Ekips Prime Pro Firmware
+Copyright (c) 2026 David Frings and the Ekips Prime Pro contributors
+Licensed under the MIT License (see LICENSE).
+
+This firmware is an independent implementation in Rust. It does not copy
+source code from the projects below, but its hardware knowledge (pin
+mapping, peripheral configuration, LED channel assignment, resistor ladder
+thresholds, charger and battery constants, LUMP protocol details) is derived
+from them. Their copyright notices and license are reproduced here.
+
+--------------------------------------------------------------------------
+Pybricks (pybricks-micropython)
+https://github.com/pybricks/pybricks-micropython
+Referenced commit: c860b6a00301fb7c6ecd429da11dcb5a6c557c7a
+Files: lib/pbio/platform/prime_hub_f4/*, lib/pbio/drv/*, lib/lego/lego/lump.h
+
+MIT License
+
+Copyright (c) 2018-2026 The Pybricks Authors
+
+--------------------------------------------------------------------------
+spike-rtic
+https://github.com/springyworks/spike-rtic
+Referenced commit: e6060b0beef16d3635b9d63f2ac829f5519be7d8
+Files: src/pins.rs, src/power.rs, dev_notes/*
+
+MIT License
+
+Copyright (c) 2026 spike-rtic contributors
+
+--------------------------------------------------------------------------
+Both projects are distributed under the MIT License:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------
+LEGO and SPIKE are trademarks of the LEGO Group, which does not sponsor,
+authorize or endorse this project.

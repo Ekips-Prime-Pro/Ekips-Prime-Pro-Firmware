@@ -51,3 +51,26 @@ decision, consequences.
   thin wrappers around it.
 - **Consequences:** `cargo test -p ekips-hub-logic --target host-tuple`
   covers the logic; only register access remains untested.
+
+## D-003 – Power latch in `__pre_init`, SWD only with `swd-debug`
+
+- **Context:** PA13 must be driven HIGH early or the hub turns itself off
+  when running from battery (Pybricks does it in `SystemInit`, spike-rtic
+  in `#[pre_init]`). PA13/PA14 are also the SWD pins.
+- **Decision:** The latch is set in a `__pre_init` written in assembly
+  (cortex-m-rt calls it before RAM initialization; Rust code is not
+  allowed there). The feature `swd-debug` omits it and leaves PA13/PA14
+  alone. See [debugging.md](debugging.md).
+- **Consequences:** Normal builds cannot be debugged over SWD.
+  `swd-debug` builds need USB power and have no port VCC.
+
+## D-007 – Panic handler: safe state, then power off
+
+- **Context:** A panic must not leave motors running or the hub draining
+  the battery forever.
+- **Decision:** The panic handler disables interrupts, sets all motor
+  H-bridge inputs LOW (coast), switches off the speaker amplifier and the
+  Bluetooth chip, logs the message via defmt, waits about 10 s and
+  releases the power latch.
+- **Consequences:** On USB power the hub stays on but inert until reset or
+  unplugged.

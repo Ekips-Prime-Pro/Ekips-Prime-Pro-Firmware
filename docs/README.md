@@ -10,6 +10,8 @@ Dateinamen.
 | Decisions / Entscheidungen | [en/decisions.md](en/decisions.md) | [de/decisions.md](de/decisions.md) |
 | Building / Bauen | [en/building.md](en/building.md) | [de/building.md](de/building.md) |
 | Memory map / Speicherbelegung | [en/memory-map.md](en/memory-map.md) | [de/memory-map.md](de/memory-map.md) |
+| Pinout / Pinbelegung | [en/pinout.md](en/pinout.md) | [de/pinout.md](de/pinout.md) |
+| Debugging | [en/debugging.md](en/debugging.md) | [de/debugging.md](de/debugging.md) |
 
 > **Status:** Nothing in this firmware has been tested on a real hub yet.
 > Everything hardware-related is *untested on hardware*.

@@ -12,6 +12,8 @@ through the `Hardware` trait from `ekips-hub-api`.
 - [Decisions](decisions.md) – why things are the way they are.
 - [Building](building.md)
 - [Memory map](memory-map.md)
+- [Pinout](pinout.md)
+- [Debugging](debugging.md)
 
 ## Ground rules
 

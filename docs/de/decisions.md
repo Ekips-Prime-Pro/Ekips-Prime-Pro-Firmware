@@ -56,3 +56,26 @@ Kontext, Entscheidung, Konsequenzen.
   Firmware sind dünne Hüllen darum.
 - **Konsequenzen:** `cargo test -p ekips-hub-logic --target host-tuple`
   deckt die Logik ab; ungetestet bleibt nur der Registerzugriff.
+
+## D-003 – Power-Latch in `__pre_init`, SWD nur mit `swd-debug`
+
+- **Kontext:** PA13 muss früh auf HIGH gesetzt werden, sonst schaltet sich
+  der Hub im Akkubetrieb selbst ab (Pybricks macht das in `SystemInit`,
+  spike-rtic in `#[pre_init]`). PA13/PA14 sind außerdem die SWD-Pins.
+- **Entscheidung:** Der Latch wird in einem in Assembler geschriebenen
+  `__pre_init` gesetzt (cortex-m-rt ruft ihn vor der RAM-Initialisierung
+  auf; Rust-Code ist dort nicht erlaubt). Das Feature `swd-debug` lässt ihn
+  weg und PA13/PA14 unverändert. Siehe [debugging.md](debugging.md).
+- **Konsequenzen:** Normale Builds sind nicht per SWD debugbar.
+  `swd-debug`-Builds brauchen USB-Versorgung und haben kein Port-VCC.
+
+## D-007 – Panic-Handler: sicherer Zustand, dann ausschalten
+
+- **Kontext:** Eine Panic darf keine Motoren laufen lassen und den Akku
+  nicht endlos leeren.
+- **Entscheidung:** Der Panic-Handler sperrt Interrupts, setzt alle
+  H-Brücken-Eingänge auf LOW (Auslaufen), schaltet Lautsprecherverstärker
+  und Bluetooth-Chip ab, loggt die Meldung über defmt, wartet ca. 10 s und
+  gibt den Power-Latch frei.
+- **Konsequenzen:** Bei USB-Versorgung bleibt der Hub an, aber untätig, bis
+  zum Reset oder Abstecken.
