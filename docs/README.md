@@ -12,6 +12,7 @@ Dateinamen.
 | Memory map / Speicherbelegung | [en/memory-map.md](en/memory-map.md) | [de/memory-map.md](de/memory-map.md) |
 | Pinout / Pinbelegung | [en/pinout.md](en/pinout.md) | [de/pinout.md](de/pinout.md) |
 | Drivers / Treiber | [en/drivers.md](en/drivers.md) | [de/drivers.md](de/drivers.md) |
+| Hardware trait / Hardware-Trait | [en/hardware-trait.md](en/hardware-trait.md) | [de/hardware-trait.md](de/hardware-trait.md) |
 | Debugging | [en/debugging.md](en/debugging.md) | [de/debugging.md](de/debugging.md) |
 
 > **Status:** Nothing in this firmware has been tested on a real hub yet.

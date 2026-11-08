@@ -90,13 +90,11 @@ enum Request {
 static REQUESTS: [Signal<CriticalSectionRawMutex, Request>; 6] = [const { Signal::new() }; 6];
 
 /// Current state of `port`.
-#[allow(dead_code, reason = "used by the Hardware implementation later")]
 pub fn state(port: Port) -> PortState {
     STATE.lock(|s| s.borrow()[port.index()])
 }
 
 /// Asks the device on `port` to switch to `mode`.
-#[allow(dead_code, reason = "used once sensor modes can be chosen by programs")]
 pub fn select_mode(port: Port, mode: u8) {
     REQUESTS[port.index()].signal(Request::Select(mode));
 }

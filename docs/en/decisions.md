@@ -94,3 +94,15 @@ decision, consequences.
 - **Consequences:** Charging from a wall charger is slower than with the
   LEGO firmware, but never exceeds what a standard USB 2.0 port must
   deliver. BCD can be added later.
+
+## D-010 – Simple P controller first, Pybricks-grade control later
+
+- **Context:** `motor_run_angle` and the drive base need closed-loop
+  control. Pybricks has a full PID with trajectories and observers; a port
+  is large and cannot be tuned without hardware.
+- **Decision:** A proportional position controller with duty limit and
+  minimum duty (`ekips_hub_logic::control`), plus a filtered speed
+  estimate. The drive base assumes a mirrored left motor.
+- **Consequences:** Moves will be less precise and may overshoot; gains
+  and signs must be tuned on hardware. The interface (`motor_control`)
+  stays when the controller is replaced.

@@ -102,3 +102,17 @@ Kontext, Entscheidung, Konsequenzen.
 - **Konsequenzen:** Laden am Netzteil dauert länger als mit der
   LEGO-Firmware, überschreitet aber nie, was ein normaler USB-2.0-Port
   liefern muss. BCD kann später ergänzt werden.
+
+## D-010 – Zuerst einfacher P-Regler, später Regelung wie Pybricks
+
+- **Kontext:** `motor_run_angle` und die Fahrbasis brauchen eine Regelung.
+  Pybricks hat einen vollständigen PID mit Trajektorien und Beobachtern;
+  eine Portierung ist groß und ohne Hardware nicht abstimmbar.
+- **Entscheidung:** Ein Proportional-Positionsregler mit Duty-Limit und
+  Mindest-Duty (`ekips_hub_logic::control`) sowie eine gefilterte
+  Drehzahlschätzung. Die Fahrbasis nimmt einen gespiegelt montierten
+  linken Motor an.
+- **Konsequenzen:** Bewegungen werden ungenauer sein und können
+  überschwingen; Verstärkungen und Vorzeichen müssen auf Hardware
+  abgestimmt werden. Die Schnittstelle (`motor_control`) bleibt, wenn der
+  Regler ersetzt wird.

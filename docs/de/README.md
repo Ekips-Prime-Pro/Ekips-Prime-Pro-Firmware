@@ -15,6 +15,7 @@ geschrieben in `no_std`-Rust mit Embassy. Sie wird Ekips-Prime-Pro-Programme
 - [Speicherbelegung](memory-map.md)
 - [Pinbelegung](pinout.md)
 - [Treiber](drivers.md)
+- [`Hardware`-Trait](hardware-trait.md)
 - [Debugging](debugging.md)
 
 ## Grundregeln

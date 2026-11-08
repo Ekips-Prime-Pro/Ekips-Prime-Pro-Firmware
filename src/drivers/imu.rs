@@ -52,13 +52,11 @@ static SHARED: Mutex<CriticalSectionRawMutex, RefCell<Shared>> = Mutex::new(RefC
 }));
 
 /// Heading in degrees since the last reset (clockwise positive).
-#[allow(dead_code, reason = "used by the Hardware implementation later")]
 pub fn heading() -> f32 {
     SHARED.lock(|s| s.borrow().tracker.heading())
 }
 
 /// Sets the heading to zero.
-#[allow(dead_code, reason = "used by the Hardware implementation later")]
 pub fn reset_heading() {
     SHARED.lock(|s| s.borrow_mut().tracker.reset());
 }

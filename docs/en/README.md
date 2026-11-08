@@ -14,6 +14,7 @@ through the `Hardware` trait from `ekips-hub-api`.
 - [Memory map](memory-map.md)
 - [Pinout](pinout.md)
 - [Drivers](drivers.md)
+- [`Hardware` trait](hardware-trait.md)
 - [Debugging](debugging.md)
 
 ## Ground rules

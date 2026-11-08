@@ -17,6 +17,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 8 | Speaker | `drivers::speaker` | compiles, waveform tested |
 | 9 | Motor H-bridges (open loop) | `drivers::motors` | compiles, pin logic tested |
 | 10 | LUMP (sensors, motor encoders) | `drivers::lump` | compiles, protocol tested |
+| 11 | Motor position/speed control | `drivers::motor_control` | compiles, controller tested |
 
 ## 1. Power latch
 
@@ -176,3 +177,13 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
 - Note: the spike-rtic LUMP reference lists checksum `0x68` for the
   "lights white" example; the correct value is `0x48` (verified in a
   unit test).
+
+## 11. Motor control
+
+- 100 Hz task: reads the encoder angle (LUMP mode 2), estimates the
+  speed, and applies the command of each port: coast, open-loop duty,
+  move to a target, or hold.
+- Proportional controller (12 ‰ duty per degree), limited by the
+  requested speed, minimum duty 12 % to overcome friction, done within
+  ±3°. Afterwards the motor holds the target with a 30 % duty limit.
+- Without encoder data a move or hold brakes instead of driving blindly.

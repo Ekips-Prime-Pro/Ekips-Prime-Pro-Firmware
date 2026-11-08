@@ -6,6 +6,7 @@ pub mod buttons;
 pub mod imu;
 pub mod lump;
 pub mod matrix;
+pub mod motor_control;
 pub mod motors;
 pub mod power;
 pub mod speaker;

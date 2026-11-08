@@ -9,6 +9,7 @@
 
 pub mod battery;
 pub mod buttons;
+pub mod control;
 pub mod imu;
 pub mod ladder;
 pub mod led;

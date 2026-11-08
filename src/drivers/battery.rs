@@ -64,7 +64,6 @@ static STATE: Mutex<CriticalSectionRawMutex, Cell<Option<BatteryState>>> =
     Mutex::new(Cell::new(None));
 
 /// Latest battery state (`None` until the first measurement).
-#[allow(dead_code, reason = "used by the Hardware implementation later")]
 pub fn state() -> Option<BatteryState> {
     STATE.lock(|c| c.get())
 }

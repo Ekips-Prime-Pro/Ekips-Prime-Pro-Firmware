@@ -13,6 +13,7 @@
 
 mod bsp;
 mod drivers;
+mod hub;
 
 use defmt_rtt as _;
 use embassy_executor::Spawner;
@@ -114,6 +115,7 @@ async fn main(spawner: Spawner) {
             f: (p.UART9, p.PD14, p.PD15, p.PC5.into()),
         },
     );
+    spawner.spawn(drivers::motor_control::task().unwrap());
     // Start-up beep.
     drivers::speaker::beep(1000, 100);
     spawner.spawn(
@@ -125,9 +127,17 @@ async fn main(spawner: Spawner) {
     );
     drivers::matrix::show_text("EKIPS");
 
+    // The VM is not integrated yet. The hub object is created so the
+    // Hardware implementation is linked and type checked.
+    let mut hub = hub::SpikeHub::new();
+    ekips_hub_api::Hardware::print(&mut hub, "hub ready");
+
     drivers::buttons::POWER_OFF_REQUEST.wait().await;
     drivers::usb::write(b"powering off\r\n");
     drivers::matrix::clear();
+    for port in ekips_hub_api::Port::ALL {
+        drivers::motor_control::coast(port);
+    }
     drivers::motors::coast_all();
     embassy_time::Timer::after_millis(100).await;
     drivers::power::power_off();

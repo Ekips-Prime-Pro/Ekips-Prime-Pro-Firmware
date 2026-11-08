@@ -18,6 +18,7 @@ Host-Unit-Tests hat.
 | 8 | Lautsprecher | `drivers::speaker` | kompiliert, Wellenform getestet |
 | 9 | Motor-H-Brücken (ungeregelt) | `drivers::motors` | kompiliert, Pin-Logik getestet |
 | 10 | LUMP (Sensoren, Motor-Encoder) | `drivers::lump` | kompiliert, Protokoll getestet |
+| 11 | Motor-Positions-/Drehzahlregelung | `drivers::motor_control` | kompiliert, Regler getestet |
 
 ## 1. Power-Latch
 
@@ -187,3 +188,14 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
 - Hinweis: Die LUMP-Referenz von spike-rtic nennt für das Beispiel
   „Licht weiß“ die Prüfsumme `0x68`; richtig ist `0x48` (per Unit-Test
   geprüft).
+
+## 11. Motorregelung
+
+- 100-Hz-Task: liest den Encoder-Winkel (LUMP-Modus 2), schätzt die
+  Drehzahl und führt den Befehl jedes Ports aus: Auslaufen, ungeregelter
+  Duty, Ziel anfahren oder halten.
+- Proportionalregler (12 ‰ Duty pro Grad), begrenzt durch die gewünschte
+  Geschwindigkeit, Mindest-Duty 12 % gegen Reibung, fertig bei ±3°.
+  Danach hält der Motor das Ziel mit maximal 30 % Duty.
+- Ohne Encoder-Daten bremst eine Bewegung bzw. ein Halten, statt blind zu
+  fahren.
