@@ -51,10 +51,20 @@ async fn main(spawner: Spawner) {
         })
         .unwrap(),
     );
+    drivers::usb::start(
+        spawner,
+        drivers::usb::UsbResources {
+            otg: p.USB_OTG_FS,
+            dp: p.PA12,
+            dm: p.PA11,
+        },
+    );
     // Green status light: firmware is running.
     drivers::status_light::set(ekips_hub_logic::led::Rgb::GREEN);
 
     drivers::buttons::POWER_OFF_REQUEST.wait().await;
+    drivers::usb::write(b"powering off\r\n");
+    embassy_time::Timer::after_millis(100).await;
     drivers::power::power_off();
 }
 

@@ -74,3 +74,12 @@ decision, consequences.
   releases the power latch.
 - **Consequences:** On USB power the hub stays on but inert until reset or
   unplugged.
+
+## D-008 – USB IDs: pid.codes test ID, not LEGO's
+
+- **Context:** The LEGO firmware uses VID `0x0694` (LEGO). Pretending to
+  be a LEGO device would confuse the official apps and is not ours to use.
+- **Decision:** Use the pid.codes test ID `1209:0001` during development.
+- **Consequences:** Before a release an own PID has to be requested from
+  pid.codes (free for open source hardware/firmware). The DFU bootloader
+  keeps its own ID `0694:0011`; this does not change.

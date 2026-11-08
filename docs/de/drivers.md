@@ -11,6 +11,7 @@ Host-Unit-Tests hat.
 | 2 | Tasten + Ausschalten per langem Druck | `drivers::buttons` | kompiliert, Logik getestet |
 | 3 | TLC5955-LED-Treiber | `drivers::tlc5955` | kompiliert, Frames getestet |
 | 3 | Status-LED (Mitteltaste) | `drivers::status_light` | kompiliert, Farblogik getestet |
+| 4 | USB-CDC-ACM-Konsole (Echo) | `drivers::usb` | kompiliert |
 
 ## 1. Power-Latch
 
@@ -65,3 +66,15 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
   RGB statt HSV als Eingabe.
 - Die Status-LED sind die zwei RGB-LEDs der Mitteltaste (oben 5/4/3, unten
   8/7/6). Die Firmware setzt sie nach dem Start auf Grün.
+
+## 4. USB-CDC-ACM-Konsole
+
+- USB OTG FS, interner PHY, PA11/PA12, VBUS-Erkennung an PA9 (der Hub hat
+  eine eigene Versorgung, daher ist die VBUS-Erkennung an).
+- VID:PID `1209:0001` (Entscheidung D-008), Hersteller „Ekips Prime Pro“,
+  Produkt „Ekips Prime Pro Hub“.
+- Alles, was der Host sendet, wird zurückgeschickt. `usb::write()` stellt
+  Text für den Host in eine Warteschlange (512-Byte-Pipe; was nicht passt,
+  wird verworfen, damit ein fehlender Host nie ein Programm blockiert).
+- Unter Linux sollte der Hub als `/dev/ttyACM0` erscheinen; testen z. B.
+  mit `picocom /dev/ttyACM0` (sobald Hardware da ist).

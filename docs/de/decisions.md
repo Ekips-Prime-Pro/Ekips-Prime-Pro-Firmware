@@ -79,3 +79,15 @@ Kontext, Entscheidung, Konsequenzen.
   gibt den Power-Latch frei.
 - **Konsequenzen:** Bei USB-Versorgung bleibt der Hub an, aber untätig, bis
   zum Reset oder Abstecken.
+
+## D-008 – USB-IDs: pid.codes-Test-ID, nicht die von LEGO
+
+- **Kontext:** Die LEGO-Firmware nutzt die VID `0x0694` (LEGO). Sich als
+  LEGO-Gerät auszugeben würde die offiziellen Apps verwirren und steht uns
+  nicht zu.
+- **Entscheidung:** Während der Entwicklung die pid.codes-Test-ID
+  `1209:0001` verwenden.
+- **Konsequenzen:** Vor einem Release muss eine eigene PID bei pid.codes
+  beantragt werden (kostenlos für Open-Source-Projekte). Der
+  DFU-Bootloader behält seine eigene ID `0694:0011`; daran ändert sich
+  nichts.

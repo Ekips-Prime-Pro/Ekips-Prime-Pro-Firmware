@@ -10,6 +10,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 2 | Buttons + power-off by long press | `drivers::buttons` | compiles, logic tested |
 | 3 | TLC5955 LED driver | `drivers::tlc5955` | compiles, frames tested |
 | 3 | Status light (center button) | `drivers::status_light` | compiles, color logic tested |
+| 4 | USB CDC-ACM console (echo) | `drivers::usb` | compiles |
 
 ## 1. Power latch
 
@@ -60,3 +61,15 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
   (`led_pwm.c`), taking RGB instead of HSV.
 - The status light is the two RGB LEDs of the center button
   (top 5/4/3, bottom 8/7/6). The firmware sets it to green once running.
+
+## 4. USB CDC-ACM console
+
+- USB OTG FS, internal PHY, PA11/PA12, VBUS sense on PA9 (the hub is
+  self-powered, so VBUS detection is on).
+- VID:PID `1209:0001` (decision D-008), manufacturer "Ekips Prime Pro",
+  product "Ekips Prime Pro Hub".
+- Everything the host sends is echoed back. `usb::write()` queues text for
+  the host (512-byte pipe; data that does not fit is dropped so a missing
+  host never blocks a program).
+- On Linux the hub should appear as `/dev/ttyACM0`; test with e.g.
+  `picocom /dev/ttyACM0` (once hardware is available).
