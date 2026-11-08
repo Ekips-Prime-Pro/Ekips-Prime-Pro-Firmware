@@ -1,0 +1,4 @@
+# udev rule (Linux) so dfu-util can access the SPIKE Prime DFU bootloader
+# without root. Copy to /etc/udev/rules.d/ and run:
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0011", MODE="0666", TAG+="uaccess"

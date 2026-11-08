@@ -13,6 +13,7 @@ geschrieben in `no_std`-Rust mit Embassy. Sie wird Ekips-Prime-Pro-Programme
 - [Entscheidungen](decisions.md) – warum die Dinge so sind, wie sie sind.
 - [Bauen](building.md)
 - [Speicherbelegung](memory-map.md)
+- [Backup, Flashen, Wiederherstellen](flashing.md)
 - [Pinbelegung](pinout.md)
 - [Treiber](drivers.md)
 - [`Hardware`-Trait](hardware-trait.md)

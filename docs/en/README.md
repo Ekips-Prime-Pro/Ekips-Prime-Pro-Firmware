@@ -12,6 +12,7 @@ through the `Hardware` trait from `ekips-hub-api`.
 - [Decisions](decisions.md) – why things are the way they are.
 - [Building](building.md)
 - [Memory map](memory-map.md)
+- [Backup, flashing, restore](flashing.md)
 - [Pinout](pinout.md)
 - [Drivers](drivers.md)
 - [`Hardware` trait](hardware-trait.md)

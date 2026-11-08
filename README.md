@@ -17,14 +17,16 @@ programs in the bytecode VM from
   (color, distance, force).
 - Implements the `Hardware` trait from `ekips-hub-api`.
 
-Flashing (hub in DFU mode):
+Build and flash (hub in DFU mode) – **read [docs/en/flashing.md](docs/en/flashing.md)
+([deutsch](docs/de/flashing.md)) first, back up the original firmware, and note
+that the firmware is untested on hardware**:
 
 ```sh
-dfu-util -d 0694:0011 -a 0 -s 0x08008000:leave -D firmware.bin
+cargo xtask bin
+dfu-util -d 0694:0011 -a 0 -s 0x08008000:leave -D target/firmware.bin
 ```
 
-**Back up the original firmware first.** The official LEGO firmware can always
-be restored via the DFU bootloader.
+The official LEGO firmware can always be restored via the DFU bootloader.
 
 ## Credits
 
