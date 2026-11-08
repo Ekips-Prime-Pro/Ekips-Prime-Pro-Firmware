@@ -62,6 +62,13 @@ async fn main(spawner: Spawner) {
     // Green status light: firmware is running.
     drivers::status_light::set(ekips_hub_logic::led::Rgb::GREEN);
     spawner.spawn(drivers::matrix::task().unwrap());
+    spawner.spawn(
+        drivers::battery::task(drivers::battery::BatteryResources {
+            iset_timer: p.TIM5,
+            iset: p.PA0,
+        })
+        .unwrap(),
+    );
     drivers::matrix::show_text("EKIPS");
 
     drivers::buttons::POWER_OFF_REQUEST.wait().await;

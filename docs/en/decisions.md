@@ -83,3 +83,14 @@ decision, consequences.
 - **Consequences:** Before a release an own PID has to be requested from
   pid.codes (free for open source hardware/firmware). The DFU bootloader
   keeps its own ID `0694:0011`; this does not change.
+
+## D-009 – Charge current 500 mA without charger detection
+
+- **Context:** Pybricks selects the ISET limit from USB battery charging
+  detection (BCD): 500 mA for a standard port, maximum for a dedicated
+  charger. Embassy's USB driver has no BCD support.
+- **Decision:** Always use the 500 mA limit (ISET 15 %) when VBUS is
+  present.
+- **Consequences:** Charging from a wall charger is slower than with the
+  LEGO firmware, but never exceeds what a standard USB 2.0 port must
+  deliver. BCD can be added later.

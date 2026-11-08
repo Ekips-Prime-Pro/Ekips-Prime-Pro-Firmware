@@ -13,6 +13,7 @@ publish = false
 workspace = true
 
 [dependencies]
+libm = "0.2"
 defmt = { version = "1", optional = true }
 
 [features]

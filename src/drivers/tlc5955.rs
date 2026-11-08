@@ -48,7 +48,6 @@ static STATE: Mutex<CriticalSectionRawMutex, RefCell<Grayscale>> =
 static CHANGED: Signal<CriticalSectionRawMutex, ()> = Signal::new();
 
 /// Sets channel `ch` to `duty` and schedules a frame update.
-#[allow(dead_code, reason = "used by the charger driver later")]
 pub fn set(ch: u8, duty: u16) {
     STATE.lock(|s| s.borrow_mut().set(ch, duty));
     CHANGED.signal(());

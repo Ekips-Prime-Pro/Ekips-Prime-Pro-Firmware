@@ -91,3 +91,14 @@ Kontext, Entscheidung, Konsequenzen.
   beantragt werden (kostenlos für Open-Source-Projekte). Der
   DFU-Bootloader behält seine eigene ID `0694:0011`; daran ändert sich
   nichts.
+
+## D-009 – Ladestrom 500 mA ohne Ladegeräterkennung
+
+- **Kontext:** Pybricks wählt das ISET-Limit über die USB-Ladeerkennung
+  (BCD): 500 mA an einem normalen Port, Maximum an einem Ladegerät. Der
+  USB-Treiber von Embassy unterstützt BCD nicht.
+- **Entscheidung:** Bei vorhandenem VBUS immer das 500-mA-Limit
+  (ISET 15 %) verwenden.
+- **Konsequenzen:** Laden am Netzteil dauert länger als mit der
+  LEGO-Firmware, überschreitet aber nie, was ein normaler USB-2.0-Port
+  liefern muss. BCD kann später ergänzt werden.

@@ -1,6 +1,7 @@
 //! Hardware drivers. All of them are **untested on hardware**.
 
 pub mod analog;
+pub mod battery;
 pub mod buttons;
 pub mod matrix;
 pub mod power;

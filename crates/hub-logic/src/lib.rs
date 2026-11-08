@@ -7,6 +7,7 @@
 
 #![no_std]
 
+pub mod battery;
 pub mod buttons;
 pub mod ladder;
 pub mod led;

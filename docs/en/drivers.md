@@ -12,6 +12,7 @@ hardware-independent part in `crates/hub-logic` has host unit tests.
 | 3 | Status light (center button) | `drivers::status_light` | compiles, color logic tested |
 | 4 | USB CDC-ACM console (echo) | `drivers::usb` | compiles |
 | 5 | 5x5 light matrix | `drivers::matrix` | compiles, font/scrolling tested |
+| 6 | Battery + charger | `drivers::battery` | compiles, conversions/state machine tested |
 
 ## 1. Power latch
 
@@ -88,3 +89,19 @@ The status light sits on the TLC5955, so the TLC5955 driver comes first
 - `matrix::set_orientation()` rotates the output. The default
   orientation is not verified on hardware.
 - At start-up the firmware scrolls "EKIPS".
+
+## 6. Battery and charging
+
+- Every 250 ms: battery current `raw * 7300 / 4096` mA, voltage
+  `raw * 9900 / 4096 + I * 3 / 16` mV (Pybricks), low-pass filtered.
+- Charge estimate: piecewise linear between 6000 mV (0 %) and 8190 mV
+  (100 %). **Approximation**, not calibrated.
+- Temperature: Pybricks' 103AT NTC formula.
+- Charger MP2639A: MODE via TLC5955 channel 14 (0 = on), ISET via
+  TIM5_CH1 / PA0 at 96 kHz, `/CHG` from resistor ladder 0. Port of the
+  Pybricks state machine: fault detection by counting `/CHG` transitions
+  in 7 samples; after 1 h of continuous charging a 30 s pause so the
+  chip's safety timer does not expire.
+- Charge current: 500 mA (ISET 15 %) whenever USB is present, see D-009.
+- Battery LED: orange charging, green full, red fault, off otherwise.
+- On battery below 6000 mV for 5 s the hub powers off.

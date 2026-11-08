@@ -13,6 +13,7 @@ Host-Unit-Tests hat.
 | 3 | Status-LED (Mitteltaste) | `drivers::status_light` | kompiliert, Farblogik getestet |
 | 4 | USB-CDC-ACM-Konsole (Echo) | `drivers::usb` | kompiliert |
 | 5 | 5×5-LED-Matrix | `drivers::matrix` | kompiliert, Schrift/Lauftext getestet |
+| 6 | Akku + Ladegerät | `drivers::battery` | kompiliert, Umrechnung/Zustandsautomat getestet |
 
 ## 1. Power-Latch
 
@@ -95,3 +96,19 @@ Die Status-LED hängt am TLC5955, daher kommt der TLC5955-Treiber zuerst
 - `matrix::set_orientation()` dreht die Ausgabe. Die Standardausrichtung
   ist nicht auf Hardware geprüft.
 - Beim Start läuft „EKIPS“ durch.
+
+## 6. Akku und Laden
+
+- Alle 250 ms: Akkustrom `raw * 7300 / 4096` mA, Spannung
+  `raw * 9900 / 4096 + I * 3 / 16` mV (Pybricks), tiefpassgefiltert.
+- Ladezustand: stückweise linear zwischen 6000 mV (0 %) und 8190 mV
+  (100 %). **Näherung**, nicht kalibriert.
+- Temperatur: NTC-Formel (103AT) aus Pybricks.
+- Ladegerät MP2639A: MODE über TLC5955-Kanal 14 (0 = an), ISET über
+  TIM5_CH1 / PA0 mit 96 kHz, `/CHG` über Widerstandsleiter 0. Portierung
+  des Pybricks-Zustandsautomaten: Fehlererkennung über die Anzahl der
+  `/CHG`-Wechsel in 7 Messungen; nach 1 h Dauerladen 30 s Pause, damit der
+  Sicherheitstimer des Chips nicht abläuft.
+- Ladestrom: 500 mA (ISET 15 %), sobald USB anliegt, siehe D-009.
+- Akku-LED: Orange = lädt, Grün = voll, Rot = Fehler, sonst aus.
+- Im Akkubetrieb unter 6000 mV für 5 s schaltet sich der Hub ab.
