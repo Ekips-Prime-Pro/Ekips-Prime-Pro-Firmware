@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  firmware:
+    name: Build, lint and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable, thumbv7em-none-eabihf)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7em-none-eabihf
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: |
+          cargo fmt --all -- --check
+          cargo fmt --manifest-path xtask/Cargo.toml -- --check
+
+      - name: Clippy (firmware, thumbv7em-none-eabihf)
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Clippy (firmware with swd-debug)
+        run: cargo clippy --all-targets --features swd-debug -- -D warnings
+
+      - name: Clippy (xtask, host)
+        run: cargo clippy --manifest-path xtask/Cargo.toml --target host-tuple -- -D warnings
+
+      - name: Unit tests (host)
+        run: |
+          cargo test -p ekips-hub-logic --target host-tuple
+          cargo test --manifest-path xtask/Cargo.toml --target host-tuple
+
+      - name: Build firmware image
+        run: cargo xtask bin
+
+      - name: Check scripts
+        run: bash -n scripts/*.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: |
+            target/firmware.bin
+            target/thumbv7em-none-eabihf/release/ekips-prime-pro-firmware

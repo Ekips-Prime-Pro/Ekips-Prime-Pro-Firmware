@@ -1,0 +1,16 @@
+[package]
+name = "ekips-hub-logic"
+description = "Hardware-independent logic of the SPIKE Prime firmware (host-testable)"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+defmt = { version = "1", optional = true }

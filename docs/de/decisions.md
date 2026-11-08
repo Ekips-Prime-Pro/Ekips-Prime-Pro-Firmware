@@ -26,3 +26,33 @@ Kontext, Entscheidung, Konsequenzen.
   enthalten.
 - **Konsequenzen:** Geflasht wird immer mit
   `dfu-util -d 0694:0011 -a 0 -s 0x08008000:leave -D firmware.bin`.
+
+## D-004 – Embassy-Zeittreiber auf TIM9
+
+- **Kontext:** Embassy braucht einen Hardware-Timer. TIM1/3/4 treiben die
+  Motoren, TIM5 das Ladegerät, TIM6 den DAC, TIM8 den Bluetooth-Takt und
+  TIM12 den TLC5955 (alles aus Pybricks' `platform.c`). `time-driver-any`
+  könnte einen davon wählen.
+- **Entscheidung:** Feature `time-driver-tim9`, Tickrate 1 MHz (TIM9 läuft
+  mit 96 MHz an APB2, Prescaler 96).
+- **Konsequenzen:** TIM2, TIM7, TIM10, TIM11, TIM13, TIM14 bleiben frei.
+
+## D-005 – Eigener `xtask` statt cargo-binutils
+
+- **Kontext:** `dfu-util` braucht eine Rohbinärdatei. `cargo objcopy`
+  erfordert zusätzliche Installationen und prüft nichts.
+- **Entscheidung:** `xtask` liest die ELF-Program-Header selbst (ohne
+  Abhängigkeiten) und lehnt Images ab, die den Bootloader berühren.
+- **Konsequenzen:** Ein Befehl (`cargo xtask bin`) für alle Plattformen;
+  die Brick-Schutz-Prüfung ist unit-getestet.
+
+## D-006 – Hardwareunabhängige Logik in eigenem Crate
+
+- **Kontext:** Ohne Hub sind Host-Unit-Tests die einzige Möglichkeit,
+  irgendetwas zu verifizieren. Das Firmware-Crate baut nur für das
+  Embedded-Target.
+- **Entscheidung:** Protokoll-Parsing, Umrechnungen und Zustandsautomaten
+  liegen in `crates/hub-logic` (`no_std`, kein Embassy). Die Treiber in der
+  Firmware sind dünne Hüllen darum.
+- **Konsequenzen:** `cargo test -p ekips-hub-logic --target host-tuple`
+  deckt die Logik ab; ungetestet bleibt nur der Registerzugriff.

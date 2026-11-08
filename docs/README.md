@@ -8,6 +8,8 @@ Dateinamen.
 |-------|---------|---------|
 | Overview / Überblick | [en/README.md](en/README.md) | [de/README.md](de/README.md) |
 | Decisions / Entscheidungen | [en/decisions.md](en/decisions.md) | [de/decisions.md](de/decisions.md) |
+| Building / Bauen | [en/building.md](en/building.md) | [de/building.md](de/building.md) |
+| Memory map / Speicherbelegung | [en/memory-map.md](en/memory-map.md) | [de/memory-map.md](de/memory-map.md) |
 
 > **Status:** Nothing in this firmware has been tested on a real hub yet.
 > Everything hardware-related is *untested on hardware*.

@@ -10,6 +10,8 @@ through the `Hardware` trait from `ekips-hub-api`.
 ## Contents
 
 - [Decisions](decisions.md) – why things are the way they are.
+- [Building](building.md)
+- [Memory map](memory-map.md)
 
 ## Ground rules
 
